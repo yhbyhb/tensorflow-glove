@@ -3,6 +3,7 @@ from collections import Counter, defaultdict
 import os
 from random import shuffle
 import tensorflow as tf
+import pickle
 
 
 class NotTrainedError(Exception):
@@ -195,6 +196,23 @@ class GloVeModel():
         labels = self.words[:word_count]
         return _plot_with_labels(low_dim_embs, labels, path, size)
 
+    def save(self, filename='default_saved_model.p'):
+        pickle.dump((self.embedding_size, 
+                     self.right_context, 
+                     self.left_context, 
+                     self.max_vocab_size, 
+                     self.min_occurrences, 
+                     self.scaling_factor, 
+                     self.cooccurrence_cap, 
+                     self.batch_size, 
+                     self.learning_rate, 
+                     self.__words, 
+                     self.__word_to_id, 
+                     self.__cooccurrence_matrix, 
+                     self.__embeddings),
+                    open(filename, "wb"))
+    def load(self, filename='default_saved_model.p'):
+        self.embedding_size, self.right_context, self.left_context, self.max_vocab_size, self.min_occurrences, self.scaling_factor, self.cooccurrence_cap, self.batch_size, self.learning_rate, self.__words, self.__word_to_id, self.__cooccurrence_matrix, self.__embeddings = pickle.load(open(filename, mode='rb'))
 
 def _context_windows(region, left_size, right_size):
     for i, word in enumerate(region):
